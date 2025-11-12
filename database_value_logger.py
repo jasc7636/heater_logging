@@ -1,43 +1,38 @@
 import sqlite3
-from froeling_sensor_values import FroelingSensorValues
 
 class DatabaseValueLogger:
-    def __init__(self, db_file="froeling_logs.sqlite3"):
+    def __init__(self, db_file: str, sensors: dict[str, dict[str, int|str]]) -> None:
+        self.sensors = sensors
+
         self.connection = sqlite3.connect(db_file)
         self.cursor = self.connection.cursor()
         self._create_table()
+        
+        self._sql_insert = """
+            INSERT INTO FROELING_SENSOR_VALUES (
+                {}
+            ) VALUES (
+                {}
+            );
+            """.format(",".join(self.sensors.keys()), ",".join("?" for _ in self.sensors))
     
     def _create_table(self) -> None:
         self.cursor.execute("""
-            CREATE TABLE IF NOT EXISTS FROELING_SENSORS (
+            CREATE TABLE IF NOT EXISTS FROELING_SENSOR_VALUES (
                 timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
-                hot_water_storage_temp_bottom REAL,
-                hot_water_storage_temp_middle REAL,
-                hot_water_storage_temp_top REAL,
-                heating_circuit_temp_in REAL,
-                heating_circuit_temp_out REAL,
-                outdoor_temp REAL
-            );
-        """)
+                {}
+            );""".format(",".join(self.sensors.keys()))
+        )
+        
+        # Verify columns in case the table already existed
+        self.cursor.execute("PRAGMA table_info('FROELING_SENSOR_VALUES');")
+        column_names = (row[1] for row in self.cursor.fetchall())
+        if not all(column in column_names for column in self.sensors.keys()):
+            raise ValueError("Database columns do not match sensor config.")
     
-    def log_froeling(self, sensor_values: FroelingSensorValues) -> None:
-        self.cursor.execute("""
-            INSERT INTO FROELING_SENSORS (
-                hot_water_storage_temp_bottom,
-                hot_water_storage_temp_middle,
-                hot_water_storage_temp_top,
-                heating_circuit_temp_in,
-                heating_circuit_temp_out,
-                outdoor_temp
-            ) VALUES (?, ?, ?, ?, ?, ?);
-        """, (
-            sensor_values.hot_water_storage_temp_bottom,
-            sensor_values.hot_water_storage_temp_middle,
-            sensor_values.hot_water_storage_temp_top,
-            sensor_values.heating_circuit_temp_in,
-            sensor_values.heating_circuit_temp_out,
-            sensor_values.outdoor_temp
-        ))
+    def log_froeling(self, sensor_values: dict[str, float]) -> None:
+        sensor_value_tuple = (sensor_values[sensor] for sensor in self.sensors)
+        self.cursor.execute(self._sql_insert, sensor_value_tuple)
         self.connection.commit()
         
     def close(self) -> None:
