@@ -1,2 +1,7 @@
 __pycache__/
 .venv/
+
+*.log
+*.sqlite3
+*.sqlite
+*.db
