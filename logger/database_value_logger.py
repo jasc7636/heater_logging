@@ -1,3 +1,4 @@
+import datetime
 import sqlite3
 import logging
 
@@ -14,18 +15,18 @@ class DatabaseValueLogger:
         
         self._sql_insert = """
             INSERT INTO FROELING_SENSOR_VALUES (
-                {}
+                unix_time,{}
             ) VALUES (
-                {}
+                ?,{}
             );
             """.format(",".join(self.sensors.keys()), ",".join("?" for _ in self.sensors))
     
     def _create_table(self) -> None:
         self.cursor.execute("""
             CREATE TABLE IF NOT EXISTS FROELING_SENSOR_VALUES (
-                timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+                unix_time INTEGER,
                 {}
-            );""".format(",".join(self.sensors.keys()))
+            );""".format(",".join((f"{sensor} REAL" for sensor in self.sensors)))
         )
         
         # Verify columns in case the table already existed
@@ -38,8 +39,9 @@ class DatabaseValueLogger:
     def log_froeling(self, sensor_values: dict[str, float]) -> None:
         logger.debug("Writing sensor values to database.")
 
-        sensor_value_tuple = (sensor_values[sensor] for sensor in self.sensors)
-        self.cursor.execute(self._sql_insert, sensor_value_tuple)
+        unix_timestamp = int(datetime.datetime.now(datetime.UTC).timestamp())
+        sensor_value_tuple = tuple(sensor_values[sensor] for sensor in self.sensors)
+        self.cursor.execute(self._sql_insert, (unix_timestamp,) + sensor_value_tuple)
         self.connection.commit()
         
     def close(self) -> None:
