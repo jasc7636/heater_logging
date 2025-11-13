@@ -1,5 +1,5 @@
 {
-    "database_name": "froeling_logs.sqlite3",
+    "database_name": "froeling_sensor_values.sqlite3",
     "sensors": {
         "hot_water_storage_temp_bottom": {
             "modbus_offset": 2002,
