@@ -39,7 +39,7 @@ class Lambdatronic3200Modbus:
                     number_of_decimals=sensor["decimal_places"],
                     functioncode=4,
                     signed=True
-                )
+                ) / sensor["scaling_factor"]
             except KeyError:
                 logger.error(f"Sensor '{sensor_name}' config is incomplete.")
             except IOError:

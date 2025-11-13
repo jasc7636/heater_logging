@@ -4,49 +4,49 @@
         "hot_water_storage_temp_bottom": {
             "modbus_offset": 2002,
             "unit": "°C",
-            "scale": 2,
+            "scaling_factor": 2,
             "decimal_places": 0
         },
         "hot_water_storage_temp_middle": {
             "modbus_offset": 2001,
             "unit": "°C",
-            "scale": 2,
+            "scaling_factor": 2,
             "decimal_places": 0
         },
         "hot_water_storage_temp_top": {
             "modbus_offset": 2000,
             "unit": "°C",
-            "scale": 2,
+            "scaling_factor": 2,
             "decimal_places": 0
         },
         "hot_water_storage_loading_level": {
             "modbus_offset": 2006,
             "unit": "%",
-            "scale": 1,
+            "scaling_factor": 1,
             "decimal_places": 0
         },
         "heating_circuit_temp_in": {
             "modbus_offset": 1030,
             "unit": "°C",
-            "scale": 2,
+            "scaling_factor": 2,
             "decimal_places": 0
         },
         "heating_circuit_temp_out": {
             "modbus_offset": 1060,
             "unit": "°C",
-            "scale": 2,
+            "scaling_factor": 2,
             "decimal_places": 0
         },
         "outdoor_temp": {
             "modbus_offset": 1000,
             "unit": "°C",
-            "scale": 2,
+            "scaling_factor": 2,
             "decimal_places": 0
         },
         "furnace_temp": {
             "modbus_offset": 0,
             "unit": "°C",
-            "scale": 2,
+            "scaling_factor": 2,
             "decimal_places": 0
         }
     }
